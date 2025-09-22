@@ -1,7 +1,5 @@
 name: Ubuntu VNC
-
 on: [workflow_dispatch]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,6 +21,15 @@ jobs:
           send "$VNC_PASSWORD\r"
           expect eof
           EOF
+      - name: Debug VNC Password and .vnc Dir
+        env:
+          VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
+        run: |
+          echo "[INFO] VNC_PASSWORD length: ${#VNC_PASSWORD}"
+          ls -l $HOME/.vnc || echo ".vnc dir not found"
+          stat $HOME/.vnc/passwd || echo "$HOME/.vnc/passwd not found"
+      - name: Start VNC Server
+        run: |
           vncserver -kill :1
           vncserver :1 -geometry 1280x720 -depth 24
       - name: Setup noVNC Server
