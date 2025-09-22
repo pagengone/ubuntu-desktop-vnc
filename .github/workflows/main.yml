@@ -1,7 +1,5 @@
 name: Ubuntu VNC
-
 on: [workflow_dispatch]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,8 +15,14 @@ jobs:
           xrdb $HOME/.Xresources
           startxfce4 &" > ~/.vnc/xstartup
           chmod +x ~/.vnc/xstartup
+      - name: Set VNC password
+        run: |
+          mkdir -p ~/.vnc
+          echo "VncPass2024!" | vncpasswd -f > ~/.vnc/passwd
+          chmod 600 ~/.vnc/passwd
+      - name: Start VNC Server
+        run: |
           vncserver :1 -geometry 1280x720 -depth 24
-
       - name: Setup noVNC Server
         run: |
           git clone https://github.com/novnc/noVNC.git ~/noVNC
