@@ -1,32 +1,29 @@
 name: Ubuntu VNC
+
 on: [workflow_dispatch]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Install Desktop Environment & VNC
+        env:
+          VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
         run: |
           sudo apt update
-          sudo apt install xfce4 xfce4-goodies tightvncserver git -y
+          sudo apt install xfce4 xfce4-goodies tightvncserver git expect -y
           mkdir -p ~/.vnc
-          echo "#!/bin/bash
-          xrdb $HOME/.Xresources
-          startxfce4 &" > ~/.vnc/xstartup
+          echo "#!/bin/bash\nxrdb $HOME/.Xresources\nstartxfce4 &" > ~/.vnc/xstartup
           chmod +x ~/.vnc/xstartup
-      - name: Set VNC password using expect
-        run: |
-          sudo apt-get install -y expect
-          mkdir -p $HOME/.vnc
           expect <<EOF
-          spawn vncpasswd
+          spawn vncserver :1
           expect "Password:"
-          send "Gomaa@123\r"
+          send "$VNC_PASSWORD\r"
           expect "Verify:"
-          send "Gomaa@123\r"
+          send "$VNC_PASSWORD\r"
           expect eof
           EOF
-      - name: Start VNC Server
-        run: |
+          vncserver -kill :1
           vncserver :1 -geometry 1280x720 -depth 24
       - name: Setup noVNC Server
         run: |
