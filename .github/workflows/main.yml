@@ -1,7 +1,5 @@
 name: Ubuntu VNC
-
 on: [workflow_dispatch]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,10 +13,18 @@ jobs:
           xrdb $HOME/.Xresources
           startxfce4 &" > ~/.vnc/xstartup
           chmod +x ~/.vnc/xstartup
-      - name: Set VNC password
+      - name: Set VNC password using expect
         run: |
-          echo "Gomaa@123" | vncpasswd -f > ~/.vnc/passwd
-          chmod 600 ~/.vnc/passwd
+          sudo apt-get install -y expect
+          mkdir -p $HOME/.vnc
+          expect <<EOF
+          spawn vncpasswd
+          expect "Password:"
+          send "Gomaa@123\r"
+          expect "Verify:"
+          send "Gomaa@123\r"
+          expect eof
+          EOF
       - name: Start VNC Server
         run: |
           vncserver :1 -geometry 1280x720 -depth 24
