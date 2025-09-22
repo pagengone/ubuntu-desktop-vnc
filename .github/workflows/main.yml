@@ -1,5 +1,7 @@
 name: Ubuntu VNC
+
 on: [workflow_dispatch]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -8,8 +10,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install xfce4 xfce4-goodies tightvncserver git -y
-          vncserver :1
-          vncserver -kill :1
           mkdir -p ~/.vnc
           echo "#!/bin/bash
           xrdb $HOME/.Xresources
@@ -17,8 +17,7 @@ jobs:
           chmod +x ~/.vnc/xstartup
       - name: Set VNC password
         run: |
-          mkdir -p ~/.vnc
-          echo "12345678" | vncpasswd -f > ~/.vnc/passwd
+          echo "Gomaa@123" | vncpasswd -f > ~/.vnc/passwd
           chmod 600 ~/.vnc/passwd
       - name: Start VNC Server
         run: |
